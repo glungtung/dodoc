@@ -95,7 +95,11 @@
 
           <div
             class="m_metaField"
-            v-if="can_access_project && project.password === 'has_pass'"
+            v-if="
+              can_access_project &&
+              project.password === 'has_pass' &&
+              project.editing_limited_to !== 'only_authors'
+            "
           >
             <label>{{ $t("protected_by_pass") }}</label>
           </div>
@@ -119,7 +123,11 @@
           </div>
 
           <button
-            v-if="!can_access_project"
+            v-if="
+              !can_access_project &&
+              project.password === 'has_pass' &&
+              project.editing_limited_to !== 'only_authors'
+            "
             type="button"
             class="buttonLink _open_pwd_input"
             :class="{ 'is--active': showInputPasswordField }"
@@ -128,6 +136,19 @@
             @click="showInputPasswordField = !showInputPasswordField"
           >
             {{ $t("password_required_to_open") }}
+          </button>
+          <button
+            v-if="
+              !can_access_project &&
+              project.editing_limited_to === 'only_authors'
+            "
+            type="button"
+            class="buttonLink"
+            style
+            :readonly="read_only"
+            @click="$root.showAuthorsListModal = true"
+          >
+            {{ $t("only_authors_can_open") }}
           </button>
 
           <div
@@ -167,7 +188,12 @@
           </div>
 
           <div
-            v-if="can_access_project && project_password && context === 'full'"
+            v-if="
+              can_access_project &&
+              project_password &&
+              context === 'full' &&
+              project.editing_limited_to !== 'only_authors'
+            "
             class="m_metaField"
           >
             <div
@@ -185,7 +211,7 @@
 
       <div class="m_project--presentation--buttons">
         <button
-          v-if="context !== 'full'"
+          v-if="context !== 'full' && can_access_project"
           type="button"
           class="m_project--presentation--buttons--openButton"
           @click.exact="openProject"
@@ -317,7 +343,8 @@
               can_access_project &&
               can_edit_project &&
               project_password &&
-              context === 'full'
+              context === 'full' &&
+              project.editing_limited_to !== 'only_authors'
             "
             type="button"
             class="_button_forgetpassword"
